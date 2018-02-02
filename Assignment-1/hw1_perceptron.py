@@ -6,6 +6,7 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 
+
 class Perceptron:
 
     def __init__(self, nb_features=2, max_iteration=10, margin=1e-4):
@@ -38,8 +39,49 @@ class Perceptron:
         # to correct weights w. Note that w[0] is the bias term. and first term is 
         # expected to be 1 --- accounting for the bias
         ############################################################################
-        raise NotImplementedError
-    
+        self.w[0]=1
+        pyW=np.matrix(self.w)
+
+        for i in range(0,self.max_iteration):
+            #random.shuffle(features)
+            for z in range(0,len(features)):
+                #z=random.randint(0,len(features)-1)
+                x=features[z]
+                #print(i)
+
+                y=pyW*np.transpose(np.matrix(x))
+
+
+                if(y.tolist()[0][0]*labels[z]<self.margin):
+                    x1=[km*labels[z] for km in x]
+                    modx=np.linalg.norm(np.array(x))
+                    x2=[km/modx for km in x1]
+
+                    pyW=pyW+np.matrix(x2)
+            self.w= pyW.tolist()[0]
+            #print(self.w)
+
+
+            for j in range(0,len(features)):
+                sum=0
+                #print(pyW)
+                #print(features[j])
+                y1=pyW*np.transpose(np.matrix(features[j]))
+                if(y1.tolist()[0][0]*labels[j]<self.margin):
+                    sum+=1
+                if(sum==0):
+
+                    #print("true")
+                    return True
+
+
+
+
+
+
+
+
+
     def reset(self):
         self.w = [0 for i in range(0,self.nb_features+1)]
         
@@ -57,9 +99,29 @@ class Perceptron:
         # This should take a list of features and labels [-1,1] and use the learned 
         # weights to predict the label
         ############################################################################
-        
-        raise NotImplementedError
+        label=[]
+        for i in range(0, len(features)):
+            z=self.w
+            y=np.matrix(z)*np.transpose(np.matrix(features[i]))
+            #print(y)
+            kmt=y.tolist()[0][0]
+            #print(kmt)
+            if(kmt<0):
+                label.append(-1)
+            else:
+                label.append(1)
+        return label
+
+
+
+
 
     def get_weights(self) -> Tuple[List[float], float]:
         return self.w
-    
+
+#model=Perceptron(2)
+#k=model.train([[1,2,3],[1,2,3]],[-1,-1])
+#print(k)
+
+#k=model.predict([[1,2,3],[2,3,4]])
+#print(k)
