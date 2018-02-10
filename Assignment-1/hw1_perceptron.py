@@ -43,17 +43,29 @@ class Perceptron:
         pyW=np.matrix(self.w)
 
         for i in range(0,self.max_iteration):
+            l1=[]
+            l2=[]
+
+            arr = np.arange(len(features))
+            #print(len(features))
+            np.random.shuffle(arr)
+            for km in arr.tolist():
+                l1.append(features[km])
+                l2.append(labels[km])
+
+
+
             #random.shuffle(features)
-            for z in range(0,len(features)):
+            for z in range(0,len(l1)):
                 #z=random.randint(0,len(features)-1)
-                x=features[z]
+                x=l1[z]
                 #print(i)
 
                 y=pyW*np.transpose(np.matrix(x))
 
 
-                if(y.tolist()[0][0]*labels[z]<self.margin):
-                    x1=[km*labels[z] for km in x]
+                if(y.tolist()[0][0]*l2[z]<self.margin):
+                    x1=[km*l2[z] for km in x]
                     modx=np.linalg.norm(np.array(x))
                     x2=[km/modx for km in x1]
 
@@ -66,8 +78,8 @@ class Perceptron:
                 sum=0
                 #print(pyW)
                 #print(features[j])
-                y1=pyW*np.transpose(np.matrix(features[j]))
-                if(y1.tolist()[0][0]*labels[j]<self.margin):
+                y1=pyW*np.transpose(np.matrix(l1[j]))
+                if(y1.tolist()[0][0]*l2[j]<self.margin):
                     sum+=1
                 if(sum==0):
 
@@ -102,6 +114,7 @@ class Perceptron:
         label=[]
         for i in range(0, len(features)):
             z=self.w
+
             y=np.matrix(z)*np.transpose(np.matrix(features[i]))
             #print(y)
             kmt=y.tolist()[0][0]
