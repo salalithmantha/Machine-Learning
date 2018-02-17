@@ -54,7 +54,7 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     np.set_printoptions(threshold=np.nan)
     pyW=np.matrix(wb.tolist()[0])
 
-    for step in range(0,10):
+    for step in range(0,max_iterations):
         l1=[]
         l2=[]
 
@@ -219,7 +219,7 @@ def multinomial_train(X, y, C,
 
 
 
-    for step in range(0, 100):
+    for step in range(0, max_iterations):
         l1 = []
         l2 = []
 
