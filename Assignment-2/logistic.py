@@ -30,7 +30,9 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     Use the average of the gradients for all training examples to
     update parameters.
     """
+
     N, D = X.shape
+    # print(y)
     assert len(np.unique(y)) == 2
 
 
@@ -41,11 +43,77 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     b = 0
     if b0 is not None:
         b = b0
+    wb=np.matrix(np.append(b,w))
+
+    xList=np.array(X).tolist()
+    train=[]
+    for i in xList:
+        z=[1]+i
+        train.append(z)
+    z=np.matrix(train)
+    np.set_printoptions(threshold=np.nan)
+    pyW=np.matrix(wb.tolist()[0])
+
+    for step in range(0,10):
+        l1=[]
+        l2=[]
+
+        arr = np.arange(len(X))
+        np.random.shuffle(arr)
+        for km in arr.tolist():
+            l1.append(z[km])
+            l2.append(y[km])
+
+
+        for i in range(0,len(l1)):
+            # print(pyW.shape)
+            # print(np.transpose(l1[i]).shape)
+
+            scores=np.dot(pyW,np.transpose(l1[i]))
+            # print("hello")
+            # print(sigmoid(scores))
+
+            pred=step_size*np.dot(sigmoid(scores)-l2[i],np.matrix(l1[i]))
+            # print(pred)
+            pyW=pyW-pred
+            # print(pyW)
+
+        sum = 0
+        for i in range(0,len(l1)):
+            scores = sigmoid(np.dot(pyW, np.transpose(l1[i])))[0]
+            if(scores>0.5):
+                k=1
+            elif(scores<0.5):
+                k=0
+            if(l2[i]!=k):
+                sum+=1
+
+        if(sum==0):
+            print("Hello")
+            w = np.array(pyW.tolist()[0][1:])
+            b = pyW.tolist()[0][0]
+            return w,b
+
+
+
+
+    # print(pred)
+
+
+
+
 
 
     """
     TODO: add your code here
     """
+    # print(w.tolist())
+    w=np.array(pyW.tolist()[0][1:])
+    # print(w)
+    b=pyW.tolist()[0][0]
+    # print(w)
+    # print(b)
+
 
     assert w.shape == (D,)
     return w, b
@@ -60,8 +128,22 @@ def binary_predict(X, w, b):
     Returns:
     - preds: N dimensional vector of binary predictions: {0, 1}
     """
+    # print(X)
     N, D = X.shape
-    preds = np.zeros(N) 
+    preds = np.zeros(N)
+    z=np.matrix(X)
+    y=[]
+    # print(X)
+    for i in range(0,len(X)):
+        scores =sigmoid(b+np.dot(w, np.transpose(z[i])))[0]
+        # print(scores)
+
+        if(scores>0.5):
+            y.append(1)
+        elif(scores<0.5):
+            y.append(0)
+    preds=np.array(y)
+
 
 
     """
@@ -109,6 +191,95 @@ def multinomial_train(X, y, C,
     if b0 is not None:
         b = b0
 
+    # print(w)
+    # print(b)
+    w_00=[]
+    for i in range(0,len(w)):
+        w_00.append(np.append(b[i], w[i]))
+    wk=np.matrix(w_00)
+
+    # print(wk)
+
+
+
+    xList = np.array(X).tolist()
+    train = []
+    for i in xList:
+        z = [1] + i
+        train.append(z)
+    z = np.matrix(train)
+    pyW = np.matrix(wk)
+
+    y_00=[]
+    for i in range(0,len(y)):
+        y_o=[0 for j in range(0,C)]
+        y_o[y[i]]=1
+        y_00.append(y_o)
+    # print(y_00)
+
+
+
+    for step in range(0, 100):
+        l1 = []
+        l2 = []
+
+        arr = np.arange(len(X))
+        np.random.shuffle(arr)
+        for km in arr.tolist():
+            l1.append(z[km])
+            l2.append(y_00[km])
+
+
+
+        for i in range(0,len(l1)):
+            # print(pyW.shape)
+            # print(np.transpose(l1[i]).shape)
+            ytm=retl(l1[i],pyW,1)
+            for k in range(0,C):
+
+                # scores=np.dot(pyW[k],np.transpose(l1[i]))
+                # print("hello")
+                # print(sigmoid(scores))
+
+                pred=step_size*np.dot(ytm[k]-l2[i][k],np.matrix(l1[i]))
+                # print(pred)
+                pyW[k]=pyW[k]-pred
+                # print(pyW)
+
+        sum = 0
+        for i in range(0,len(l1)):
+            max1=[]
+            k=retl(l1[i],pyW,0)
+            if(l2[i]!=k):
+                sum+=1
+        if (sum == 0):
+            print("Hello")
+            w = []
+            b = []
+            w1 = pyW.tolist()
+            # print(w1)
+            for i in w1:
+                b.append(i[0])
+                k = i[1:]
+                w.append(k)
+            w = np.array(w)
+            b = np.array(b)
+            return w, b
+
+
+    w=[]
+    b=[]
+    w1=pyW.tolist()
+    # print(w1)
+    for i in w1:
+        b.append(i[0])
+        k=i[1:]
+        w.append(k)
+    w=np.array(w)
+    b=np.array(b)
+
+
+
 
     """
     TODO: add your code here
@@ -117,6 +288,42 @@ def multinomial_train(X, y, C,
     assert w.shape == (C, D)
     assert b.shape == (C,)
     return w, b
+
+
+def retl(x,w,sel):
+    yy=[]
+    for i in range(0,len(w)):
+        scores = np.dot(w[i], np.transpose(x))
+        yy.append(scores)
+    k=softMax(yy)
+    sol=[]
+    for i in range(0,len(w)):
+        z=k[i]/sum(k)
+        sol.append(z)
+    if(sel==1):
+        return sol
+    return sol.index(max(sol))
+
+
+def ret(x,w,b):
+    yy=[]
+    for i in range(0,len(w)):
+        scores = np.dot(w[i], np.transpose(x))
+        yy.append(b[i]+scores)
+    k=softMax(yy)
+    sol=[]
+    for i in range(0,len(w)):
+        z=k[i]/sum(k)
+        sol.append(z)
+    return sol.index(max(sol))
+
+def softMax(w):
+    y=[]
+    for j in w:
+        y.append(np.exp(j))
+    return y
+
+
 
 
 def multinomial_predict(X, w, b):
@@ -140,7 +347,18 @@ def multinomial_predict(X, w, b):
 
     """
     TODO: add your code here
-    """   
+    """
+    pyW=np.array(w)
+    bb=np.array(b)
+    l1=np.array(X)
+    z=[]
+
+    for i in range(0, len(l1)):
+        max1 = []
+        k = ret(l1[i], pyW,bb)
+        z.append(k)
+    preds=np.array(z)
+    # print(preds)
 
     assert preds.shape == (N,)
     return preds
@@ -177,6 +395,27 @@ def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     if b0 is not None:
         b = b0
 
+
+    # print(C)
+    # print(y)
+    pyW=[]
+    bb=[]
+    for i in range(0,C):
+        train_y=[1 if k==i else 0 for k in y ]
+        # print(train_y)
+        l , k =binary_train(X,train_y)
+        pyW.append(l)
+        bb.append(k)
+
+    w=np.array(pyW)
+    b=np.array(bb)
+    # print(w)
+    # print(b)
+
+
+
+
+
     """
     TODO: add your code here
     """
@@ -208,6 +447,16 @@ def OVR_predict(X, w, b):
     """
     TODO: add your code here
     """
+    a=[]
+
+    for i in range(0,C):
+        # N,D=np.array(np.matrix(X).tolist()[0]).shape
+        a.append(binary_predict(X,w[i],b[i]))
+    k=np.argmax(np.array(a),0)
+    preds=np.array(k)
+
+
+
 
     assert preds.shape == (N,)
     return preds
@@ -230,26 +479,33 @@ def run_binary():
 
     print('Performing binary classification on synthetic data')
     X_train, X_test, y_train, y_test = toy_data_binary()
-        
+
     w, b = binary_train(X_train, y_train)
-    
+
     train_preds = binary_predict(X_train, w, b)
     preds = binary_predict(X_test, w, b)
-    print('train acc: %f, test acc: %f' % 
+
+
+
+
+    print('train acc: %f, test acc: %f' %
             (accuracy_score(y_train, train_preds),
              accuracy_score(y_test, preds)))
-    
+
     print('Performing binary classification on binarized MNIST')
     X_train, X_test, y_train, y_test = data_loader_mnist()
 
     binarized_y_train = [0 if yi < 5 else 1 for yi in y_train] 
     binarized_y_test = [0 if yi < 5 else 1 for yi in y_test] 
-    
+
     w, b = binary_train(X_train, binarized_y_train)
     
     train_preds = binary_predict(X_train, w, b)
     preds = binary_predict(X_test, w, b)
-    print('train acc: %f, test acc: %f' % 
+
+
+
+    print('train acc: %f, test acc: %f' %
             (accuracy_score(binarized_y_train, train_preds),
              accuracy_score(binarized_y_test, preds)))
 
@@ -271,6 +527,7 @@ def run_multiclass():
         w, b = OVR_train(X_train, y_train, C=num_classes)
         train_preds = OVR_predict(X_train, w=w, b=b)
         preds = OVR_predict(X_test, w=w, b=b)
+
         print('train acc: %f, test acc: %f' % 
             (accuracy_score(y_train, train_preds),
              accuracy_score(y_test, preds)))
@@ -279,7 +536,7 @@ def run_multiclass():
         w, b = multinomial_train(X_train, y_train, C=num_classes)
         train_preds = multinomial_predict(X_train, w=w, b=b)
         preds = multinomial_predict(X_test, w=w, b=b)
-        print('train acc: %f, test acc: %f' % 
+        print('train acc: %f, test acc: %f' %
             (accuracy_score(y_train, train_preds),
              accuracy_score(y_test, preds)))
 
