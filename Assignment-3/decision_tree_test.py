@@ -8,6 +8,7 @@ import decision_tree
 # load data
 X_train, X_test, y_train, y_test = data_loader.discrete_2D_iris_dataset()
 
+
 # set classifier
 dTree = decision_tree.DecisionTree()
 
@@ -30,3 +31,5 @@ dTree.print_tree()
 # save
 json.dump({'train_accu': train_accu, 'test_accu': test_accu},
 			open('decision_tree.json', 'w'))
+
+

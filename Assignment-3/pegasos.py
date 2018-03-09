@@ -10,14 +10,34 @@ def objective_function(X, y, w, lamb):
     - ytrain: A 1 dimensional numpy array of labels (length = number of samples )
     - w: a numpy array of D elements as a D-dimension vector, which is the weight vector and initialized to be all 0s
     - lamb: lambda used in pegasos algorithm
-
     Return:
     - train_obj: the value of objective function in SVM primal formulation
     """
     # you need to fill in your solution here
+    xList = np.array(X).tolist()
+    train = []
+    for i in xList:
+        z = [1] + i
+        train.append(z)
+    # print(X)
+    z = np.matrix(train)
+    w1 = np.transpose(np.matrix(w))
+    sum=0
+
+    for i in range(0, len(y)):
+        k = 1 - y[i] * np.matmul(np.transpose(w1), np.transpose(np.matrix(z[i]))).tolist()[0][0]
+        m = max(0, k)
+        sum += m
+    sum = sum / len(y)
+    wsqr = np.matmul(w1, np.transpose(w1))
+    wsqr = lamb * wsqr / 2
+    obj_value = wsqr + sum
+
+    return obj_value.tolist()[0]
 
 
-    return obj_value
+
+
 
 
 ###### Q1.2 ######
@@ -30,7 +50,6 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
     - lamb: lambda used in pegasos algorithm
     - k: mini-batch size
     - max_iterations: the maximum number of iterations to update parameters
-
     Returns:
     - learnt w
     - traiin_obj: a list of the objective function value at each iteration during the training process, length of 500.
@@ -40,6 +59,15 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
     ytrain = np.array(ytrain)
     N = Xtrain.shape[0]
     D = Xtrain.shape[1]
+    w1 = np.transpose(np.matrix(np.append(0, w)))
+    xlist = Xtrain.tolist()
+    train = []
+    for i in xlist:
+        z = [1] + i
+        train.append(z)
+    z = np.matrix(train)
+
+
 
     train_obj = []
 
@@ -47,8 +75,47 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
         A_t = np.floor(np.random.rand(k) * N).astype(int)  # index of the current mini-batch
 
         # you need to fill in your solution here
+        aplus=[]
+        alist=[i for i in range(0,N)]
+        for i in A_t:
+            # print(np.shape(np.transpose(w1)))
+            # print(np.shape(np.transpose(z[i])))
+            # yy=np.random.random_integers(0,N)
+            # while(yy not in alist):
+            #     yy=np.random.random_integers(0,N)
+            f=ytrain[i]*np.matmul(np.transpose(w1),np.transpose(z[i])).tolist()[0][0]
+            # print(f)
+            if(f<1):
+                aplus.append(i)
+        insum = [0 for j in range(0, D + 1)]
+        insum = np.transpose(np.matrix(insum))
+        # print(insum)
+        # print(np.shape(w1))
+        for kk in aplus:
+
+            # print(np.shape(np.transpose(z[k])*ytrain[k]))
+            insum = np.add(insum,(np.transpose(z[kk])*ytrain[kk]))
+            # print(np.shape(insum))
+        nu = 1 / (lamb * iter)
+        # print(k)
+        w15 = np.add((1 - (nu * lamb)) * w1,((nu)/(k))*insum)
+        # print(np.sqrt(lamb))
+        # if(np.linalg.norm(w15)!=0):
+        w2 = min(1, ((1 / (np.sqrt(lamb)*np.linalg.norm(w15)))))* w15
+        # else:
+        #     w2=np.copy(w15)
+        w1 = np.copy(w2)
+        znow=[]
+        ynow=[]
+        for i in A_t:
+            znow.append(Xtrain[i])
+            ynow.append(ytrain[i])
+        w = np.transpose(np.copy(w1)).tolist()[0]
+        train_obj.append(objective_function(znow,ynow,w,lamb))
 
 
+
+    w=np.transpose(np.copy(w1)).tolist()[0]
     return w, train_obj
 
 
@@ -60,12 +127,34 @@ def pegasos_test(Xtest, ytest, w, t = 0.):
     - ytest: A list of num_test labels
     - w_l: a numpy array of D elements as a D-dimension vector, which is the weight vector of SVM classifier and learned by pegasos_train()
     - t: threshold, when you get the prediction from SVM classifier, it should be real number from -1 to 1. Make all prediction less than t to -1 and otherwise make to 1 (Binarize)
-
     Returns:
     - test_acc: testing accuracy.
     """
     # you need to fill in your solution here
+    f = []
+    correct = 0
+    wrong = 0
+    # xList = np.array(Xtest).tolist()
+    # train = []
+    # for i in xList:
+    #     z = [1] + i
+    #     train.append(z)
+    # print(X)
+    z = np.matrix(Xtest)
 
+    for i in range(0, len(ytest)):
+        f.append(w[0]+np.matmul(np.matrix(w[1:]), np.transpose(z[i])).tolist()[0][0])
+    # print(f)
+    # print(ytest)
+    # print(f)
+    for i in range(0, len(ytest)):
+        if (f[i] < t):
+            if (ytest[i] == -1):
+                correct += 1
+        else:
+            if (ytest[i] == 1):
+                correct += 1
+    test_acc = correct / len(ytest)
 
     return test_acc
 
