@@ -44,7 +44,7 @@ class Boosting(Classifier):
 		# print(sum2)
 		h=[]
 		for i in sum2:
-			if(i<=0):
+			if(i<=-1):
 				h.append(-1)
 			else:
 				h.append(1)
@@ -67,7 +67,7 @@ class AdaBoost(Boosting):
 		z=[]
 		self.T+=1
 
-		for i in range(self.T):
+		for i in range(0,self.T):
 			sum1=[]
 			for j in range(0,len(self.clfs)):
 				l=list(self.clfs)[j].predict(features)
