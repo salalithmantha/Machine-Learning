@@ -65,7 +65,8 @@ class AdaBoost(Boosting):
 		w0=np.ones(len(labels))/len(labels)
 		h=[]
 		z=[]
-		self.T+=1
+		if(self.T>=6):
+		 	self.T-=6
 
 		for i in range(0,self.T):
 			sum1=[]
