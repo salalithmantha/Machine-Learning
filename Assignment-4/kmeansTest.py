@@ -31,8 +31,29 @@ def transform_image(image, code_vectors):
     # - implement the function
 
     # DONOT CHANGE CODE ABOVE THIS LINE
-    raise Exception(
-        'Implement transform_image function (filename:kmeansTest.py')
+    # raise Exception(
+    #     'Implement transform_image function (filename:kmeansTest.py')
+    # print(image.shape)
+    # print(image[0])
+    # print(code_vectors.shape)
+    # print(code_vectors[0])
+    # print("hello")
+    # print(image)
+    # print(" fdaf")
+    # print(code_vectors )
+
+    for i in range(0,image.shape[0]):
+        for j in range(0,image.shape[1]):
+            min = 9223372036854775807
+            temp=[]
+            for k in range(0,len(code_vectors)):
+                kt = np.sum((image[i][j] - code_vectors[k]) ** 2)
+                if(kt<=min):
+                    min=kt
+                    temp=code_vectors[k]
+            image[i][j]=temp
+    # print(image)
+    return image
     # DONOT CHANGE CODE BELOW THIS LINE
 
 
@@ -92,6 +113,7 @@ def kmeans_image_compression():
 
     # convert to RGB array
     data = im.reshape(N * M, 3)
+
 
     k_means = KMeans(n_cluster=16, max_iter=100, e=1e-6)
     centroids, _, i = k_means.fit(data)

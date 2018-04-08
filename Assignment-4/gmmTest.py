@@ -82,7 +82,6 @@ for i in init:
 # We fit a gaussian distribution on digits dataset and show generate samples from the distribution
 # Complete implementation of sample function for GMM class in gmm.py
 ################################################################################
-
 x_train, x_test, y_train, y_test = load_digits()
 
 for i in init:
@@ -125,3 +124,4 @@ for i in init:
 
     np.savez('results/gmm_digits_{}.npz'.format(i), iterations=np.array(
         [iterations]), variances=gmm.variances, pi_k=gmm.pi_k, means=gmm.means, samples=samples, log_likelihood=ll, x=x_test, y=y_test)
+
