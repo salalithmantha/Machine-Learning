@@ -258,8 +258,10 @@ class GMM():
             for j in range(0,K[0][i]):
                 z.append(np.array(x[j]).tolist())
 
+        lt=np.array(z)
+        np.random.shuffle(lt)
+        return lt
 
-        return np.array(z)
 
 
 
@@ -319,3 +321,4 @@ class GMM():
 
 
         # DONOT MODIFY CODE BELOW THIS LINE
+
