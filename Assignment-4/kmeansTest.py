@@ -41,6 +41,7 @@ def transform_image(image, code_vectors):
     # print(image)
     # print(" fdaf")
     # print(code_vectors )
+    img1=np.zeros(np.shape(image))
 
     for i in range(0,image.shape[0]):
         for j in range(0,image.shape[1]):
@@ -48,12 +49,13 @@ def transform_image(image, code_vectors):
             temp=[]
             for k in range(0,len(code_vectors)):
                 kt = np.sum((image[i][j] - code_vectors[k]) ** 2)
+                # kt=np.linalg.norm(image[i][j] - code_vectors[k])
                 if(kt<=min):
                     min=kt
                     temp=code_vectors[k]
-            image[i][j]=temp
+            img1[i][j]=temp
     # print(image)
-    return image
+    return img1
     # DONOT CHANGE CODE BELOW THIS LINE
 
 
