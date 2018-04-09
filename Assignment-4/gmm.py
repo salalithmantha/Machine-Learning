@@ -121,7 +121,7 @@ class GMM():
         # print(var)
         update=0
         for iter in range(0, self.max_iter):
-            print(iter)
+            #print(iter)
             update+=1
             # step 6
             gamma=[]
@@ -290,6 +290,7 @@ class GMM():
         mean=np.array(self.means)
         var=np.array(self.variances)
         pi=np.array(self.pi_k)
+        sum1=0
         for i in range(0, len(x)):
             inexplist = []
             for j in range(0, len(mean)):
@@ -307,15 +308,17 @@ class GMM():
                 dv = np.matmul(diff, np.linalg.inv(var[j]))
                 inexp = np.matmul(dv, diffT) / (-2)
                 inexplist.append(inexp.tolist()[0][0])
+            temp=[]
             for j in range(0, len(mean)):
                 # outexp=np.exp((inexplist[j]-min(inexplist))/(max(inexplist)-min(inexplist)))
                 outexp = np.exp(inexplist[j])
-                norm = outexp / (2 * np.pi * abs(np.linalg.det(var[j]))) ** (0.5)
+                norm = outexp / (((2 * np.pi)**(len(x[0]))) * abs(np.linalg.det(var[j])))**(0.5)
                 temp.append(pi[j] * norm)
-        sum1 = sum(temp)
+
+            sum1+= np.log(sum(temp))
         # print(temp)
         # print(type(np.log(sum1)))
-        return float(np.log(sum1))
+        return float(sum1)
 
 
 

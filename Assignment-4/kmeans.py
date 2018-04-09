@@ -66,7 +66,7 @@ class KMeans():
                 # l=np.argmin(temp)
                 r[i][minindex]=1
             # print(r)
-            print(update)
+            #print(update)
 
 
             # for i in range(0,N):
