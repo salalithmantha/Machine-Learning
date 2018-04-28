@@ -21,6 +21,28 @@ def pca(X = np.array([]), no_dims = 50):
     M = np.array([])
 
     """TODO: write your code here"""
+
+
+    # Y = np.zeros((X.shape[0],no_dims))
+    covariance = np.cov(X.T)
+    eigenValue, eigenVector = np.linalg.eig(covariance)
+    # print(eigenValue)
+    # print(eigenVector)
+    eigenVectorValues = [(np.abs(eigenValue[i]), eigenVector[:, i]) for i in range(len(eigenValue))]
+    eigenVectorValues.sort(key=lambda temp: temp[0])
+
+    eigenVectorValues.reverse()
+    # print(eigenVectorValues)
+
+    M= eigenVectorValues[0][1].reshape(X.shape[1], 1)
+    # print(M)
+    for i in range(1, no_dims):
+        M = np.hstack((M, eigenVectorValues[i][1].reshape(X.shape[1], 1)))
+    Y = np.dot(X, M)
+    # print(Y)
+
+
+
     
     return Y, M
 
@@ -42,6 +64,7 @@ def decompress(Y = np.array([]), M = np.array([])):
     X_hat = np.array([])
 
     """TODO: write your code here"""
+    X_hat=np.dot(Y,M.T)
     
     return X_hat
 
@@ -56,6 +79,7 @@ def reconstruction_error(orig = np.array([]), decompressed = np.array([])):
     error = 0
 
     """TODO: write your code here"""
+    error=((orig-decompressed)**2).mean()
     
     return error
 
